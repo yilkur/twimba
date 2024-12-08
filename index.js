@@ -1,5 +1,14 @@
-import { tweetsData } from './data.js'
+import { tweetsData as initialTweetsData } from './data.js'
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
+
+let tweetsData =
+  JSON.parse(localStorage.getItem('tweetsData')) || initialTweetsData
+
+const saveTweetsData = () => {
+  localStorage.setItem('tweetsData', JSON.stringify(tweetsData))
+}
+
+saveTweetsData()
 
 document.addEventListener('click', e => {
   const { like, retweet, reply } = e.target.dataset
@@ -21,6 +30,7 @@ const toggleLike = tweetId => {
   if (tweet) {
     tweet.isLiked = !tweet.isLiked
     tweet.likes += tweet.isLiked ? 1 : -1
+    saveTweetsData()
     renderFeed()
   }
 }
@@ -31,13 +41,14 @@ const toggleRetweet = tweetId => {
   if (tweet) {
     tweet.isRetweeted = !tweet.isRetweeted
     tweet.retweets += tweet.isRetweeted ? 1 : -1
+    saveTweetsData()
     renderFeed()
   }
 }
 
 const toggleReplyVisibility = replyId => {
   const replyContainer = document.getElementById(`replies-${replyId}`)
-  
+
   if (replyContainer) {
     replyContainer.classList.toggle('hidden')
   }
@@ -50,6 +61,7 @@ const addNewTweet = () => {
   if (tweetText) {
     tweetsData.unshift(createTweetObject(tweetText))
     tweetInput.value = ''
+    saveTweetsData()
     renderFeed()
   }
 }
